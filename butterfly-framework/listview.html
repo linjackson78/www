@@ -1,0 +1,48 @@
+<div data-view>
+
+  <script id="mail-template" type="text/x-underscore-template">
+    <div class="email-model">
+
+      <div class="mailInfoFrist">
+      <img src="../mail/img/gray.png" alt="" class="listState">
+      <div class="mailName"><%=fromusername%></div>
+      <div class="mailTime fontFamily"><%= date %></div>
+    </div>
+
+    <div class="mailInfoSecoud">
+        <%= _.escape(subject) %>
+    </div>
+
+    <div class="mailImgCopy"></div>
+    </div>
+  </script>
+
+  <header class="bar bar-nav">
+    <a class="icon icon-left-nav pull-left" data-action="back"></a>
+    <h1 class="title">ListView</h1>
+  </header>
+
+  <div class="content">
+
+    <div id="mail-list" class="listview high">
+        <div class="scroller">
+            <div class="pulldown">
+              <span class="icon"></span><span class="label"></span>
+            </div>
+            <ul>
+            </ul>
+            <button class="loadmore btn btn-block btn-outlined">
+              <div class="label">加载更多</div>
+              <span class="icon"></span>
+            </button>
+              <div class="message">
+                <div class="empty">没有数据</div>
+                <div class="error">数据加载失败</div>
+              </div>
+           </div>
+        </div>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,31 @@
+<div data-view="player/player" id="player-view">
+  <header class="header">
+    <h1 class="current-channel">channels</h1>
+  </header>
+  <div class="player" >
+    <div class="progress-wrapper">
+      <div class="progress">
+        <div class="pie_left"><div class="left"></div></div>
+        <div class="pie_right"><div class="right"></div></div>
+        <div id="cover"></div>
+      </div>
+    </div>
+    <div id="lrc" class="lrc-ctrl">
+      <div class="lrc-scroller">
+        <div class="lrc-content"></div>
+      </div>
+    </div>
+    <div id="title">加载中</div>
+    <div id="artist">加载中</div>
+    <ul class="control-pannel">
+      <li id="next" class="icon">&#59940</li><li class="lrc-ctrl icon">&#60024</li><li class="download-pannel-ctrl icon">&#59966</li>
+    </ul>
+    <audio autoplay id="song" src=""></audio>
+  </div>
+  <div class="download-mask download-pannel-ctrl">
+    <ul class="download-pannel">
+      <li class="download-btn icon">&#59966</li>
+      <li class="download-list-btn icon">&#60024</li>
+    </ul>
+  </div>
+</div>

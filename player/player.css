@@ -1,0 +1,183 @@
+body {
+	font-family: Tahoma "微软雅黑";
+}
+
+@font-face {
+	font-family: 'icomoon';
+	src: url('./fonts/icomoon.eot'); 
+	src: url('./fonts/icomoon.eot?#iefix') format('embedded-opentype'), 
+	     url('./fonts/icomoon.woff') format('woff'), 
+	     url('./fonts/icomoon.ttf')  format('truetype'), 
+	     url('./fonts/icomoon.svg#svgFontName') format('svg'); 
+}
+
+#player-view {
+	background-color: white;
+}
+
+.icon {
+	font-family: "icomoon" Tahoma;
+	width: 30px;
+	height: 30px;
+}
+
+.header {
+	position: absolute;
+	top:0;
+	display: block;
+	height: 70px;
+	width: 100%;
+	text-align: center;
+}
+.header h1 {
+	text-align: center;
+	font-size: 24px;
+	line-height: 70px;
+	color: #87AE8B;
+}
+
+.player {
+	position: relative;
+	top: 70px;
+	padding: 10px 20px;
+	margin: 0 auto;
+}
+
+#lrc {
+	display: none;
+	position: absolute;
+	top:0;
+	left:0;
+	bottom:50px;
+	width: 100%;
+	z-index: 10;
+	background-color: white;
+	opacity: 0.8;
+	color: #999;
+	text-align: center;
+	font-size: 20px;
+	font-weight: lighter;
+	line-height: 30px;
+	overflow: hidden;
+}
+
+.lrc-scroller {
+	width: 100%;
+	padding: 0 20px;
+	position: absolute;
+	width: inherit;
+}
+
+#lrc .error-tip {
+	position: relative;
+	top:50px;
+	font-size: 30px;
+	line-height: 100%;
+}
+
+p.current-lrc {
+	color: #87AE8B;
+	font-weight: normal;
+}
+
+#title {
+	font-size: 20px;
+	margin: 40px auto 10px;
+	text-align: center;
+}
+
+#artist {
+	font-size: 16px;
+	color: #51504E;
+	margin: 10px auto;
+	text-align: center;
+}
+
+.control-pannel {
+	margin: 40px auto;
+	text-align: center;
+	height: 30px;
+	line-height: 30px;
+}
+
+#next {
+	font-size: 30px;
+}
+
+.lrc {
+	font-size: 30px;
+}
+
+.progress-wrapper {
+	position: relative;
+	margin: 0 auto;
+	width: 200px;
+	height: 200px;
+}
+
+.progress {
+	width: 200px;
+	height: 200px;
+	position: absolute;
+	border-radius: 50%;
+	background: #6CBD7B;
+}
+
+.pie_left, .pie_right {
+	width:200px; 
+	height:200px;
+	position: absolute;
+	top: 0;left: 0;
+}
+
+.left, .right {
+	width:200px; 
+	height:200px;
+	background:#eee;
+	border-radius: 50%;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.pie_right, .right {
+	clip:rect(0,auto,auto,100px);
+}
+
+.pie_left, .left {
+	clip:rect(0,100px,auto,0);
+}
+
+#cover {
+	width: 180px;
+	height: 180px;
+	border-radius: 50%;
+	left: 10px;
+	top: 10px;
+	background-size: cover;
+	position: absolute;
+}
+
+.download-mask {
+	display: none;
+	position: absolute;
+	top:0;
+	background-color: #eee;
+	width: 100%;
+	height: 100%;
+	opacity: 0.8;
+}
+
+.download-pannel {
+	position: absolute;
+	bottom: 100px;
+	width: 100%;
+	height: 30px;
+	border-top:1px solid #999;
+	border-bottom: 1px solid #999;
+	text-align: center;
+}
+
+.download-btn {
+
+}
