@@ -5,6 +5,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
         iScrollCount: 0,
         iScrollArr: [],
         downloadQue: {},
+        isDeviceReady: false,
 
         events: {
             "click #next": "next",
@@ -21,12 +22,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
         },
         render: function() {
             var _this = this;
-            //get myRoot
-            window.webkitRequestFileSystem(window.TEMPORARY, 100*1024*1024, function(fs){
-                fs.root.getDirectory("myDouban", {create:true}, function(dirEntry){
-                    _this.myRoot = dirEntry;
-                }, _this.err)
-            }, _this.err)
         },
 
         onShow: function() {
@@ -36,14 +31,16 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             _this.$lrc = $("#lrc")
             _this.canvas = document.getElementById("progress")
             _this.context = _this.canvas.getContext("2d");
-            _this.currentChannel = location.hash.split("id=")[1] || Util.getData("currentChannel") || 1;
+            _this.currentChannel = location.hash.split("id=")[1] || 1;
 
             _this.requestChannelDetail(_this.currentChannel);
 
             _this.song.onended = function() {
                 _this.next();
             };
-            _this.song.ontimeupdate = function() {
+            _this.song.ontimeupdate = onPlaying;
+
+            function onPlaying() {
                 _this.progress();
                 if (_this.timeStampArray && !_this.isTouchingLrc) {
                     var index = _this.timeStampArray.indexOf(Math.floor(_this.song.currentTime))
@@ -63,7 +60,21 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                 }
             }
 
-            if (!_this.$song.attr("src") || _this.oldChannel != _this.currentChannel) _this.next();
+            document.addEventListener("deviceready", function(){
+                _this.isDeviceReady = true;
+                _this.myRoot = cordova.file.externalRootDirectory + "myDouban/";
+                window.resolveLocalFileSystemURL(_this.myRoot, function(entry){
+                    _this.myRootEntry = entry;
+                }, _this.err)
+                console.log("device is ready!")
+                setInterval(onPlaying, 500)
+            })
+            var offlineSong = location.hash.split("?")[1]
+            if (offlineSong && offlineSong.indexOf("offline") != -1) {
+                _this.next(offlineSong)
+            }
+
+            if (!_this.$song.attr("src") || _this.oldChannel != _this.currentChannel) _this.next("id=1");
 
             $("#lrc").get(0).addEventListener("touchstart", function() {
                 console.log("touch start!")
@@ -83,7 +94,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
 
         requestChannelDetail: function(id) {
             var _this = this;
-            console.log("request channel id is ", id)
             Client.apiRequest({
                 url: {
                     "path": "/j/explore/channel_detail",
@@ -96,7 +106,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             })
         },
 
-        next: function() {
+        next: function(query) {
             var _this = this;
             _this.xhr4Song ? _this.xhr4Song.abort() : null;
             _this.xhr4Lrc ? _this.xhr4Lrc.abort() : null;
@@ -104,33 +114,48 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             $(".lrc-content").html("<p class='error-tip'>正在加载歌词</p>")
             console.log("正在请求这首新歌的信息")
             _this.song ? _this.song.pause() : null;
-            _this.xhr4Song = Client.apiRequest({
-                url: {
-                    "path": "/j/app/radio/people",
-                    "app_name": "radio_desktop_win",
-                    "version": 100,
-                    "type": "n",
-                    "channel": _this.currentChannel
-                },
-                success: function(data) {
-                    //data = Util.fakeData
-                    var song = data.song[0]
-                    $("#song").attr("src", _this.currentSongSrc = song.url).load();
-                    $("#cover").css("background-image", "url(" + (_this.currentSongPic = song.picture) + ")");
-                    $("#title").text(_this.currentSongTitle = song.title);
-                    $("#artist").text(_this.currentSongArtist = song.artist);
-                    var songRecord = Util.getData("songRecord") || [];
-                    songRecord.unshift({
-                        title: _this.currentSongTitle,
-                        artist: _this.currentSongArtist,
-                        coverSrc: _this.currentSongPic,
-                        songSrc: _this.currentSongSrc,
-                    });
-                    Util.saveData("songRecord", songRecord)
-                    console.log(songRecord);
-                    _this.searchBaidu(song.title, song.artist)
-                }
-            })
+
+            if (query.indexOf("id") != -1) {
+                _this.xhr4Song = Client.apiRequest({
+                    url: {
+                        "path": "/j/app/radio/people",
+                        "app_name": "radio_desktop_win",
+                        "version": 100,
+                        "type": "n",
+                        "channel": _this.currentChannel
+                    },
+                    success: function(data) {
+                        //data = Util.fakeData
+                        var song = data.song[0]
+                        onSongChange(song.url,  song.picture, song.title, song.artist.replace(/\s+\/\s+/g, "-"))
+                    }
+                });
+            } else if (query.indexOf("offline") != -1) {
+                var offlineSongSrc;
+                var title = query.match(/=(.*)-/)[1];
+                var artist = query.match(/-(.*)/)[1]
+                _this.myRootEntry.getFile(query.split("=")[1] + ".mp3", {}, function(fileEntry){
+                    offlineSongSrc = fileEntry.nativeURL;
+                    onSongChange(offlineSongSrc, "http://img5.douban.com/lpic/s6988468.jpg", title, artist)
+                }, _this.err)
+                
+            }
+            
+            function onSongChange(src, cover, title, artist){
+                $("#song").attr("src", _this.currentSongSrc = src).load();
+                $("#cover").css("background-image", "url(" + (_this.currentSongPic = cover) + ")");
+                $("#title").text(_this.currentSongTitle = title);
+                $("#artist").text(_this.currentSongArtist = artist);
+                var songRecord = Util.getData("songRecord") || [];
+                songRecord.unshift({
+                    title: _this.currentSongTitle,
+                    artist: _this.currentSongArtist,
+                    coverSrc: _this.currentSongPic,
+                    songSrc: _this.currentSongSrc,
+                });
+                Util.saveData("songRecord", songRecord)
+                _this.searchBaidu(title, artist)
+            }
         },
 
         searchBaidu: function(title, artist) {
@@ -219,14 +244,15 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             //if (!_this.deviceready) return;
             var _this = this;
             console.log("downloadIng!!!!!")
-            _this.myRoot.getDirectory("test1", {create: true}, function(dirEntry){
-                dirEntry.getFile("test1.mp3", {create:true}, function(fileEntry){
+            if (!_this.isDeviceReady) return;
 
-                    fileEntry.createWriter(function(writer){
-
-                    }, _this.err)
-                }, _this.err)
+            var fileTransfer = new FileTransfer();
+            var url = encodeURI(_this.currentSongSrc);
+            fileTransfer.download(url, _this.myRoot + _this.currentSongTitle + "-" + _this.currentSongArtist + ".mp3", function(entry){
+                console.log("success!!!:", entry)
             }, _this.err)
+
+            
         },
 
         toggleLrc: function() {
@@ -235,7 +261,9 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             if (_this.lrcScroller) setTimeout(function() {
                 _this.lrcScroller.refresh();
                 _this.isTouchingLrc = false;
-                _this.lrcScroller.scrollToElement(_this.currentLrcEle, 200, 0, true)
+                try {
+                    _this.lrcScroller.scrollToElement(_this.currentLrcEle, 200, 0, true)
+                } catch(e) {}
             }, 300);
         },
 

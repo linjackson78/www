@@ -51,3 +51,20 @@
 .clearfix{
 	clear: both;
 }
+
+.record-song-list {
+	display: none;
+}
+
+.offline-song-list {
+
+}
+
+.offline-li {
+	height: 30px;
+	padding: 5px;
+	font-size: 20px;
+	line-height: 30px;
+	font-family: Tahoma;
+	
+}
