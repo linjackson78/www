@@ -80,6 +80,10 @@ p.current-lrc {
 	font-weight: normal;
 }
 
+.lrc-pad {
+	height: 200px;
+}
+
 #title {
 	font-size: 20px;
 	margin: 40px auto 10px;

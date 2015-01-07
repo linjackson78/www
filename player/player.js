@@ -45,22 +45,15 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             };
             _this.song.ontimeupdate = function() {
                 _this.progress();
-                //console.log("first two condition are ", _this.timeStampArray, _this.isTouchingLrc)
-                //console.log(Math.floor(_this.song.currentTime))
                 if (_this.timeStampArray && !_this.isTouchingLrc) {
                     var index = _this.timeStampArray.indexOf(Math.floor(_this.song.currentTime))
                     if (index !== -1) {
-                        if (_this.lrcScroller && _this.$lrc.has("p") && !_this.isTouchingLrc) {
-                            _this.$lrc.find("p").removeClass("current-lrc").eq(index).addClass("current-lrc")
-                            try {
-                                _this.lrcScroller.goToPage(0, index, 1000)
-                                    //console.log("gotopage is ", index)
-                            } catch (err) {}
-                            /*console.log(_this.lrcScroller.minScrollY)
+                        if (_this.lrcScroller && !_this.isTouchingLrc) {
+                            console.log(_this.lrcScroller.minScrollY)
                             var $lrcP = _this.$lrc.find("p").removeClass("current-lrc");
                             var curEl = $lrcP.get(index)
                             curEl.className = "current-lrc";
-                            _this.lrcScroller.scrollToElement(curEl, 200, 0, true)*/
+                            _this.lrcScroller.scrollToElement(curEl, 200, 0, true)
                         }
                     }
                 }
@@ -75,6 +68,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             })
             $("#lrc").get(0).addEventListener("touchend", function() {
                     console.log("touch end!")
+                    _this.isTouchingLrc = false;
                     _this.touchIsEnd = true;
                 })
         },
@@ -186,32 +180,12 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     var html = result.text;
                     _this.timeStampArray = result.timeStampArray;
                     _this.iScrollArr[_this.iScrollCount] = null;
-                    //if (_this.lrcScroller) _this.lrcScroller = null;
+                    if (_this.lrcScroller) _this.lrcScroller = null;
                     $(".lrc-content").html(html)
                     setTimeout(function() {
-                        _this.iScrollCount++;
-                        _this.lrcScroller = _this.iScrollArr[_this.iScrollCount] = new IScroll("#lrc", {
-                            snap: "p",
-                        })
-                        _this.iScrollArr[_this.iScrollCount].on("scrollEnd", function() {
-                            console.log("scroll End!!", _this.lrcScroller.currentPage.pageY)
-                            if (_this.isTouchingLrc && _this.touchIsEnd) {
-                                _this.song.currentTime = _this.timeStampArray[_this.lrcScroller.currentPage.pageY]
-                                _this.isTouchingLrc = false;
-                                /*_this.timer = null
-                                _this.timer = setTimeout(function(){
-                                    
-                                    console.log("timeout!")
-                                },500)*/
-                            }
-                        })
-
-                        /*$("#lrc").get(0).addEventListener("touchend", function(){
-                            console.log("touch end~", _this.lrcScroller.currentPage.pageY)
-                            _this.isTouchingLrc = false;
-                            _this.lrcScroller.goToPage(0, _this.lrcScroller.currentPage.pageY, 0)
-                        })*/
-
+                        _this.lrcScroller = new IScroll("#lrc", {
+                        });
+                        _this.lrcScroller.minScrollY = -400;
                     }, 1000)
                     console.log("总算下载完了真累")
                 },
