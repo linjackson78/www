@@ -34,6 +34,8 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             _this.song = document.getElementById("song");
             _this.$song = $("#song")
             _this.$lrc = $("#lrc")
+            _this.canvas = document.getElementById("progress")
+            _this.context = _this.canvas.getContext("2d");
             _this.currentChannel = location.hash.split("id=")[1] || Util.getData("currentChannel") || 1;
 
             _this.requestChannelDetail(_this.currentChannel);
@@ -75,9 +77,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     console.log("touch end!")
                     _this.touchIsEnd = true;
                 })
-                /*document.addEventListener("deviceready", function(){
-                    _this.deviceReady = true;
-                })*/
         },
 
         onHide: function() {
@@ -161,7 +160,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     path: "/data/music/links",
                     songids: id,
                 },
-
                 success: function(data) {
                     var url = "http://ting.baidu.com" + data.data.songList[0].lrcLink;
                     _this.loadLrc(url)
@@ -225,7 +223,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             function lrcErr() {
                 console.log("没歌词！")
                 $(".lrc-content").html("<span class='error-tip'>晕了又没有歌词</span>")
-                    //_this.lrcScroller.refresh();
             }
 
 
@@ -278,16 +275,17 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
 
         progress: function() {
             //console.log(this.song.played.length, this.song.currentTime, this.song.duration)
+            var _this = this;
             if (this.song.readyState != 4 || this.song.paused || this.song.currentTime == 0) return;
             var percent = Math.ceil(this.song.currentTime / this.song.duration * 10000) / 100
             var deg = percent * 3.6;
-            if (deg <= 180) {
-                $(".progress").find('.left').css('transform', "rotate(0deg)");
-                $(".progress").find('.right').css('transform', "rotate(" + deg + "deg)");
-            } else {
-                $(".progress").find('.right').css('transform', "rotate(180deg)");
-                $(".progress").find('.left').css('transform', "rotate(" + (deg - 180) + "deg)");
-            };
+            _this.canvas.width = _this.canvas.width;
+            _this.context.beginPath();
+            _this.context.arc(100, 100, 95, -Math.PI * 0.5,  deg /360 * Math.PI * 2 - Math.PI * 0.5, false)
+            _this.context.strokeStyle = "#87AE8B";
+            _this.context.lineWidth = 10;
+            _this.context.lineCap = "round";
+            _this.context.stroke();
         },
 
     });

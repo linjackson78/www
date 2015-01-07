@@ -120,32 +120,10 @@ p.current-lrc {
 	height: 200px;
 	position: absolute;
 	border-radius: 50%;
-	background: #6CBD7B;
+	background-color: #efefef;
 }
 
-.pie_left, .pie_right {
-	width:200px; 
-	height:200px;
-	position: absolute;
-	top: 0;left: 0;
-}
-
-.left, .right {
-	width:200px; 
-	height:200px;
-	background:#eee;
-	border-radius: 50%;
-	position: absolute;
-	top: 0;
-	left: 0;
-}
-
-.pie_right, .right {
-	clip:rect(0,auto,auto,100px);
-}
-
-.pie_left, .left {
-	clip:rect(0,100px,auto,0);
+#progress {
 }
 
 #cover {
