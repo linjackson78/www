@@ -3,6 +3,8 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 
 		events: {
 			"click .back": "toPlayer",
+			"click #offline": "toggleOffline",
+			"click #record": "toggleRecord",
 		},
 
 		render: function(){
@@ -18,6 +20,17 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 
 		toPlayer: function(){
 			history.back();
+		},
+
+		toggleRecord: function(){
+			var songRecord = Util.getData("songRecord") || null;
+			songRecord.forEach(function(record, index){
+				
+			})
+		},
+
+		toggleOffline: function(){
+
 		},
 	});
 })

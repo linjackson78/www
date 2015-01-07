@@ -14,6 +14,24 @@
 	display: block;
 	width:38px;
 	height: 39px;
+	position:absolute;
+}
+
+.song-nav {
+	margin: 0 auto;
+	width: 50%;
+	height: inherit;
+}
+
+.song-nav-tab {
+	box-sizing: border-box;
+	color: #eee;
+
+	float: left;
+	width: 50%;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
 }
 
 .song-list-wrapper {
@@ -28,4 +46,8 @@
 .song-list {
 	position: absolute;
 	height: 1000px;
+}
+
+.clearfix{
+	clear: both;
 }

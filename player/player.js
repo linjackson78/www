@@ -48,13 +48,16 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                 if (_this.timeStampArray && !_this.isTouchingLrc) {
                     var index = _this.timeStampArray.indexOf(Math.floor(_this.song.currentTime))
                     if (index !== -1) {
-                        if (_this.lrcScroller && !_this.isTouchingLrc) {
+                        if (_this.lrcScroller) {
                             console.log(_this.lrcScroller.minScrollY)
                             var $lrcP = _this.$lrc.find("p").removeClass("current-lrc");
                             var curEl = $lrcP.get(index)
                             _this.currentLrcEle = curEl;
-                            curEl.className = "current-lrc";
-                            _this.lrcScroller.scrollToElement(curEl, 200, 0, true)
+                            if (curEl) {
+                                curEl.className = "current-lrc";
+                                _this.lrcScroller.scrollToElement(curEl, 200, 0, true);
+                            };
+                            
                         }
                     }
                 }
@@ -116,6 +119,15 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     $("#cover").css("background-image", "url(" + (_this.currentSongPic = song.picture) + ")");
                     $("#title").text(_this.currentSongTitle = song.title);
                     $("#artist").text(_this.currentSongArtist = song.artist);
+                    var songRecord = Util.getData("songRecord") || [];
+                    songRecord.unshift({
+                        title: _this.currentSongTitle,
+                        artist: _this.currentSongArtist,
+                        coverSrc: _this.currentSongPic,
+                        songSrc: _this.currentSongSrc,
+                    });
+                    Util.saveData("songRecord", songRecord)
+                    console.log(songRecord);
                     _this.searchBaidu(song.title, song.artist)
                 }
             })
