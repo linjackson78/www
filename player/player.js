@@ -52,6 +52,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                             console.log(_this.lrcScroller.minScrollY)
                             var $lrcP = _this.$lrc.find("p").removeClass("current-lrc");
                             var curEl = $lrcP.get(index)
+                            _this.currentLrcEle = curEl;
                             curEl.className = "current-lrc";
                             _this.lrcScroller.scrollToElement(curEl, 200, 0, true)
                         }
@@ -222,6 +223,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             if (_this.lrcScroller) setTimeout(function() {
                 _this.lrcScroller.refresh();
                 _this.isTouchingLrc = false;
+                _this.lrcScroller.scrollToElement(_this.currentLrcEle, 200, 0, true)
             }, 300);
         },
 
