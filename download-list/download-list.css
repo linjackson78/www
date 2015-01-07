@@ -1,0 +1,31 @@
+#download-list-view {
+	background-color: white;
+}
+
+
+.download-list-header {
+	background-color: #666;
+	height: 40px;
+}
+
+.back {
+	background: url(../channels/back.png);
+	background-size: cover;
+	display: block;
+	width:38px;
+	height: 39px;
+}
+
+.song-list-wrapper {
+	position: absolute;
+	top: 40px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
+}
+
+.song-list {
+	position: absolute;
+	height: 1000px;
+}

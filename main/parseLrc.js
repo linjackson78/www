@@ -1,54 +1,54 @@
-define(["text!player/test.txt"], function(test){
+define(["text!player/test.txt"], function(test) {
 	return {
-		toPLabel: function(text){
+		toPLabel: function(text) {
 			var timeStampArr = [];
 			var resultHTML = "";
-            var obj = {};
+			var obj = {};
 			var timeStamp = /(?:\[(\d{2})\:(\d{2})\.\d{2,3}\])/g,
 				blankTimeStamp = /(?:\[\d{2}\:\d{2}\.\d{2,3}\])+\s+/g,
 				otherTags = /\[\D+\]/g,
 				dup = /((?:\[\d+\]){2,})(.+)/g,
-        tagPlusWords = /\[(\d+)\](.+)/g;
-                
-			text = text.replace(/^\s*|\s*$/m, "")
-				   .replace(blankTimeStamp, "")
-				   .replace(otherTags, "")
-				   //console.log(text)
-				   .replace(timeStamp, function(match, p1, p2){
-				       return "[" + (p1 * 60 + parseInt(p2) ) + "]";
-				   })
-				   //console.log(text)
-				   .replace(dup, function(match, p1, p2){
-				       var words = p2;
-                       var timeTags = p1;
-				       var arr = [];
-				       while (timeTags != ""){
-					       	timeTags = timeTags.replace(/\[\d+\]/, function(tag){
-					       		arr.push(tag);
-					       		return "";
-					       	})
-				       }
-				       var result = ""
-				       arr.forEach(function(tag){
-				       	   result = result + tag + words + "\n";
-				       })
-               return result;
-				   })
-           .replace(tagPlusWords, function(match, p1, p2){
-               obj[p1] = p2
-               timeStampArr.push(parseInt(p1))
-           });
+				tagPlusWords = /\[(\d+)\](.+)/g;
 
-            var resultText = "";
-            timeStampArr.sort(function(a, b){
-                return a-b
-            }).forEach(function(time){
-                resultText = resultText + "<p data-time='" + time + "'>" + obj[time] + "</p>"
-            });
-            return {
-                "text": resultText,
-                timeStampArray: timeStampArr
-            };
+			text = text.replace(/^\s*|\s*$/m, "")
+				.replace(blankTimeStamp, "")
+				.replace(otherTags, "")
+				//console.log(text)
+				.replace(timeStamp, function(match, p1, p2) {
+					return "[" + (p1 * 60 + parseInt(p2)) + "]";
+				})
+				//console.log(text)
+				.replace(dup, function(match, p1, p2) {
+					var words = p2;
+					var timeTags = p1;
+					var arr = [];
+					while (timeTags != "") {
+						timeTags = timeTags.replace(/\[\d+\]/, function(tag) {
+							arr.push(tag);
+							return "";
+						})
+					}
+					var result = ""
+					arr.forEach(function(tag) {
+						result = result + tag + words + "\n";
+					})
+					return result;
+				})
+				.replace(tagPlusWords, function(match, p1, p2) {
+					obj[p1] = p2
+					timeStampArr.push(parseInt(p1))
+				});
+
+			var resultText = "";
+			timeStampArr.sort(function(a, b) {
+				return a - b
+			}).forEach(function(time) {
+				resultText = resultText + "<p data-time='" + time + "'>" + obj[time] + "</p>"
+			});
+			return {
+				"text": resultText,
+				timeStampArray: timeStampArr
+			};
 
 			/*var timeStampArr = []
 			var timeStamp = /(?:\[(\d{2})\:(\d{2})\.\d{2,3}\])+/g,

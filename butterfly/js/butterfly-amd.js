@@ -22,7 +22,6 @@ require.config({
 		spin: 'butterfly/vendor/spinjs/spin',
 		hogan: 'butterfly/vendor/requirejs-hogan-plugin/hogan',
 		hgn: 'butterfly/vendor/requirejs-hogan-plugin/hgn',
-		//debug: "http://localhost:8080/target/target-script-min.js#anonymous",
 	},
 	waitSeconds: 5,
 	shim: {
@@ -34,7 +33,6 @@ require.config({
 		},
 		iscroll: {exports: 'IScroll'},
 		fastclick: {exports: 'FastClick'},
-		//debug: {exports: "Debug"}
 	}
 });
 
