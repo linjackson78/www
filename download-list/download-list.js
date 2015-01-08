@@ -3,9 +3,10 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 
 		events: {
 			"click .back": "toPlayer",
-			"click #offline": "toggleOffline",
-			"click #record": "toggleRecord",
-			"click .offline-li": "toPlayer"
+			"click #offline": "showOffline",
+			"click #record": "showRecord",
+			"click .offline-li": "toPlayer",
+			"click .record-li": "toPlayer"
 		},
 
 		err: function(e){
@@ -27,9 +28,10 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 			    _this.myRoot = cordova.file.externalRootDirectory + "myDouban/";
 			    window.resolveLocalFileSystemURL(_this.myRoot, function(entry){
 			    	_this.myRootEntry = entry;
-			    	_this.toggleOffline();
+			    	
 			    })
 			})
+			_this.showRecord();
 		},
 
 		toPlayer: function(e){
@@ -37,16 +39,22 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 			var $target = $(e.target)
 			if ($target.hasClass("back")) history.back();
 			if ($target.hasClass("offline-li")) butterfly.navigate("#player/player.html?offline=" + $target.text())
+			if ($target.hasClass("record-li")) butterfly.navigate("#player/player.html?record=" + $target.data("id"))
 		},
 
-		toggleRecord: function(){
-			var songRecord = Util.getData("songRecord") || null;
+		showRecord: function(){
+			var _this = this;
+			var songRecord = Util.getData("songRecord")
+			var html = "";
 			songRecord.forEach(function(record, index){
-				
+				html += "<li class='record-li' data-id='"+ record.title + "'>" + record.title + "-" + record.artist + "</li>"
 			})
+			$(".record-song-list").html(html).show();
+			$(".offline-song-list").hide();
+			_this.songListScroller.refresh();
 		},
 
-		toggleOffline: function(){
+		showOffline: function(){
 			var _this = this;
 			var dirReader = _this.myRootEntry.createReader();
 			var entries = [];
@@ -69,13 +77,15 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 			function readEntriesDone(entries){
 				var html = "";
 				entries.forEach(function(entry){
-					html += "<li class='offline-li'>" 
-					+ entry.name.replace(".mp3", "")
-					+ "</li>";
+					if (entry.name.indexOf("channelCache") == -1) {
+						html += "<li class='offline-li'>"
+						+ "</li>";
+					}
 
 				})
-				$(".offline-song-list").html(html)
-
+				$(".offline-song-list").html(html).show();
+				$(".record-song-list").hide();
+				_this.songListScroller.refresh();
 			}
 		},
 	});

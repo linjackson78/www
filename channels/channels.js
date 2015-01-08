@@ -75,7 +75,7 @@ define(['butterfly/view', "main/util", "main/client", "css!channels/channels", "
 
     toMain: function(id){
         //像开头的events对象里绑定这个函数，如果不显示传入id的话，居然会默认传入jquery.events对象，所以这里不能用 id ? ... : ... 而用!id.currentTarget
-        !id.currentTarget ? butterfly.navigate("player/player.html?id=" + id ) : history.back();
+        !id.currentTarget ? butterfly.navigate("player/player.html?channel=" + id ) : history.back();
     },
 
   });

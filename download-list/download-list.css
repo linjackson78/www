@@ -57,13 +57,13 @@
 }
 
 .offline-song-list {
-
+	display: none;
 }
 
-.offline-li {
+.offline-li, .record-li{
 	height: 30px;
 	padding: 5px;
-	font-size: 20px;
+	font-size: 12px;
 	line-height: 30px;
 	font-family: Tahoma;
 	
