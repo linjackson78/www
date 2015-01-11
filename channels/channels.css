@@ -35,14 +35,25 @@
 }
 
 .channel {
-	height:80px;
+	height:100px;
 	width: 80px;
-	border-radius: 50%;
-	text-align: center;
 	color: #999;
-	line-height: 80px;
 	float: left;
 	overflow: hidden;
 	margin: 8px;
+}
+
+.channel-cover {
+	height:80px;
+	width: 80px;
+	border-radius: 50%;
 	background-size: cover;
+}
+
+.channel-title {
+	height: 20px;
+	width: 80px;
+	text-align: center;
+	font-size: 14px;
+	line-height: 20px;
 }

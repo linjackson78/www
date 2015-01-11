@@ -2,7 +2,6 @@ define(['butterfly/view', "main/util", "main/client", "css!channels/channels", "
 
   return View.extend({
 
-    firstTime: true,
     isLoading: false,
     itemSize: 36,
     lastItem: 0,
@@ -12,15 +11,16 @@ define(['butterfly/view', "main/util", "main/client", "css!channels/channels", "
         "click .channel": "changeChannel"
   	},
 
+    err: function(e){
+        console.log(e)
+    },
+
     render: function(){
         console.log("channels on render ", this.firstTime)
-        
     },
 
     onShow: function(){
         var _this = this;
-        console.log("is first time?: ", _this.firstTime)
-
         if (!this.myScroll) {
             this.myScroll = new IScroll(".my-wrapper", {
                 probeType: 1,
@@ -36,12 +36,22 @@ define(['butterfly/view', "main/util", "main/client", "css!channels/channels", "
                 }
             })
         }
-    	
-    	if (_this.firstTime) {
+
+        document.addEventListener("deviceready", function(){
+            _this.isDeviceReady = true;
+            console.log("device ready!")
+            _this.myRoot = cordova.file.externalRootDirectory + "myDouban/";
+            _this.coverRoot = _this.myRoot + "_channelCache/";
+            window.resolveLocalFileSystemURL(_this.myRoot, function(entry){
+                _this.myRootEntry = entry;
+                entry.getDirectory("_channelCache", {create: true}, function(entry){
+                    _this.coverRootEntry = entry;
+                })
+                
+            }, _this.err);
             _this.requestChannelsList(++_this.lastItem, _this.itemSize)
             _this.lastItem += _this.itemSize;
-            _this.firstTime = false;
-        };
+        })
     },
 
     requestChannelsList: function(start, limit){
@@ -55,21 +65,52 @@ define(['butterfly/view', "main/util", "main/client", "css!channels/channels", "
                 "limit": limit
             },
             success: function(data){
-                data.data.channels.forEach(function(obj) {
-                    var html = _.template(channelItem)(obj)
-                    $(html).appendTo($channels)
-                    _this.isLoading = false;
+                var channelArr = data.data.channels;
+                var count = 0;
+                channelArr.forEach(function(obj) {
+                    checkExist(obj.name + ".jpg");
+                    function checkExist (file) {
+                        _this.coverRootEntry.getFile(file, {create: false}, function(entry){
+                            obj.cover = entry.nativeURL;
+                            var html = _.template(channelItem)(obj)
+                            $(html).appendTo($channels)
+                            count++;
+                            if (count == channelArr.length) {
+                                coverhandler()
+                            }
+                        }, function(){
+                            downloadFile(obj.cover, _this.coverRoot + obj.name + ".jpg", function(entry){
+                                obj.cover = entry.nativeURL;
+                                var html = _.template(channelItem)(obj)
+                                $(html).appendTo($channels)
+                                count++;
+                                if (count == channelArr.length) {
+                                    coverhandler()
+                                }
+                            })
+                        })
+                    }
+                    
+                    function downloadFile(url, path, successCb) {
+                        var fileTransfer = new FileTransfer();
+                        var url = encodeURI(url);
+                        fileTransfer.download(url, path, successCb, _this.err);
+                        return fileTransfer;
+                    }
                 })
-                setTimeout(function(){
-                    _this.myScroll.refresh();
-                }, 500)
+
+                function coverhandler (){
+                    setTimeout(function(){
+                        _this.myScroll.refresh();
+                        _this.isLoading = false;
+                    }, 500)
+                }
             }
         })
     },
 
     changeChannel: function(e){
         var targetChannelId = $(e.target).closest("li").data("id");
-        console.log("click: ", targetChannelId)
         this.toMain(targetChannelId)
     },
 

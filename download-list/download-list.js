@@ -25,11 +25,12 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 
 			document.addEventListener("deviceready", function(){
 			    _this.isDeviceReady = true;
+			    console.log("device ready!")
 			    _this.myRoot = cordova.file.externalRootDirectory + "myDouban/";
 			    window.resolveLocalFileSystemURL(_this.myRoot, function(entry){
 			    	_this.myRootEntry = entry;
 			    	
-			    })
+			    }, _this.err)
 			})
 			_this.showRecord();
 		},
@@ -46,9 +47,13 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 			var _this = this;
 			var songRecord = Util.getData("songRecord")
 			var html = "";
-			songRecord.forEach(function(record, index){
-				html += "<li class='record-li' data-id='"+ record.title + "'>" + record.title + "-" + record.artist + "</li>"
-			})
+			if (songRecord) {
+				songRecord.forEach(function(record, index){
+					html += "<li class='record-li' data-id='"+ record.title + "'>" + record.title + "-" + record.artist + "</li>"
+				})
+			} else {
+				html = "<li class='error-li'> 没有收听纪录 </li>";
+			}
 			$(".record-song-list").html(html).show();
 			$(".offline-song-list").hide();
 			_this.songListScroller.refresh();
@@ -76,13 +81,17 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 
 			function readEntriesDone(entries){
 				var html = "";
-				entries.forEach(function(entry){
-					if (entry.name.indexOf("channelCache") == -1) {
-						html += "<li class='offline-li'>"
-						+ "</li>";
-					}
-
-				})
+				if (entries) {
+					entries.sort();
+					entries.forEach(function(entry){
+						if (entry.name.indexOf("_channelCache") == -1) {
+							html += "<li class='offline-li'>" + entry.name
+							+ "</li>";
+						}
+					})
+				} else {
+					html = "<li class='error-li'> 还没下载过歌曲 </li>";
+				}
 				$(".offline-song-list").html(html).show();
 				$(".record-song-list").hide();
 				_this.songListScroller.refresh();
