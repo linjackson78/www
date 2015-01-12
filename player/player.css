@@ -17,8 +17,10 @@ body {
 
 .icon {
 	font-family: "icomoon" Tahoma;
-	width: 30px;
-	height: 30px;
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	font-size: 20px;
 }
 
 .header {
@@ -46,16 +48,16 @@ body {
 #lrc {
 	display: none;
 	position: absolute;
-	top:0;
-	left:0;
-	bottom:50px;
-	width: 100%;
+	top:-70px;
+	left:10%;
+	bottom:0;
+	width: 80%;
 	z-index: 10;
 	background-color: white;
-	opacity: 0.8;
+	opacity: 0.9;
 	color: #999;
 	text-align: center;
-	font-size: 20px;
+	font-size: 18px;
 	font-weight: lighter;
 	line-height: 30px;
 	overflow: hidden;
@@ -65,7 +67,7 @@ body {
 	width: 100%;
 	padding: 0 20px;
 	position: absolute;
-	width: inherit;
+	width: 100%;
 }
 
 #lrc .error-tip {
@@ -73,6 +75,10 @@ body {
 	top:50px;
 	font-size: 30px;
 	line-height: 100%;
+}
+
+.lrc-content p {
+	letter-spacing: 1px;
 }
 
 p.current-lrc {
@@ -88,6 +94,7 @@ p.current-lrc {
 	font-size: 20px;
 	margin: 40px auto 10px;
 	text-align: center;
+	letter-spacing: 0;
 }
 
 #artist {
@@ -95,17 +102,6 @@ p.current-lrc {
 	color: #51504E;
 	margin: 10px auto;
 	text-align: center;
-}
-
-.control-pannel {
-	margin: 40px auto;
-	text-align: center;
-	height: 30px;
-	line-height: 30px;
-}
-
-#next {
-	font-size: 30px;
 }
 
 .lrc {
@@ -140,26 +136,63 @@ p.current-lrc {
 	position: absolute;
 }
 
-.download-mask {
-	display: none;
-	position: absolute;
-	top:0;
-	background-color: #eee;
-	width: 100%;
-	height: 100%;
-	opacity: 0.8;
+.download-btn {
+
 }
 
-.download-pannel {
+.upside-control-pannel {
+	margin-top: 50px;
+	text-align: center;
+	color: #51504E;
+	width: 60%;
+	height: 33px;
+	position: relative;
+	left: 20%;
+}
+
+
+.auto-download {
+	font-size: 31px;
 	position: absolute;
-	bottom: 100px;
-	width: 100%;
-	height: 30px;
-	border-top:1px solid #999;
-	border-bottom: 1px solid #999;
+	left:0;
+	top:-4px;
+}
+
+
+.lrc-ctrl {
+	position: absolute;
+	left: 43%;
+}
+
+.download-list-btn {
+	position: absolute;
+	right: 0;
+}
+
+.control-pannel {
+	position: absolute;
+	bottom: 50px;
+	left: 10%;
+	height: 40px;
+	width: 80%;
 	text-align: center;
 }
 
-.download-btn {
+.control-pannel .icon {
+	width: 33px;
+	height: 33px;
+	font-size: 33px;
+	color: #808080;
+}
 
+.share {
+	float: left;
+}
+
+#next {
+	float: right;
+}
+
+.icon-active {
+	color: #87AE8B;
 }

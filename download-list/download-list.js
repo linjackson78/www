@@ -43,7 +43,7 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 			if ($target.hasClass("record-li")) butterfly.navigate("#player/player.html?record=" + $target.data("id"))
 		},
 
-		showRecord: function(){
+		showRecord: function(e){
 			var _this = this;
 			var songRecord = Util.getData("songRecord")
 			var html = "";
@@ -56,6 +56,8 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 			}
 			$(".record-song-list").html(html).show();
 			$(".offline-song-list").hide();
+			$("#offline").removeClass("song-nav-tab-active")
+			$("#record").addClass("song-nav-tab-active")
 			_this.songListScroller.refresh();
 		},
 
@@ -94,6 +96,8 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 				}
 				$(".offline-song-list").html(html).show();
 				$(".record-song-list").hide();
+				$("#offline").addClass("song-nav-tab-active")
+				$("#record").removeClass("song-nav-tab-active")
 				_this.songListScroller.refresh();
 			}
 		},

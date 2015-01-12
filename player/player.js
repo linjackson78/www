@@ -18,7 +18,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             "click #cover": "togglePlay",
             "click .current-channel": "toChannels",
             "click .lrc-ctrl": "toggleLrc",
-            "click .download-pannel-ctrl": "toggleDownloadPannel",
             "click .download-btn": "download",
             "click .download-list-btn": "toDownloadList",
         },
@@ -158,15 +157,19 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
 
                 $("#lrc").get(0).addEventListener("touchstart", function() {
                     _this.isTouchingLrc = true;
+                    if (_this.lrcTimer) clearTimeout(_this.lrcTimer);
                 });
                 $("#lrc").get(0).addEventListener("touchend", function() {
                     _this.isTouchingLrc = false;
                     try {
-                        setTimeout(function() {
+                        _this.lrcTimer = setTimeout(function() {
                             if (_this.lrcScroller) _this.lrcScroller.scrollToElement(_this.currentLrcEle, 200, 0, true)
-                        }, 700)
+                        }, 1000)
                     } catch (e) {}
                 });
+                $(".icon").each(function(){
+
+                })
             }
         },
 
@@ -269,7 +272,8 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             }
 
             function onSongChange(src, cover, title, artist, lrc) {
-                $("#song").attr("src", _this.currentSongSrc = src).load();
+                $("#song").attr("src", _this.currentSongSrc = src).load()
+                _this.song.play();
                 $("#cover").css("background-image", "url(" + (_this.currentSongPic = cover) + ")");
                 $("#title").text(_this.currentSongTitle = title);
                 $("#artist").text(_this.currentSongArtist = artist);
@@ -465,11 +469,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             } else {
                 _this.song.pause();
             }
-        },
-
-        toggleDownloadPannel: function() {
-            var _this = this;
-            $(".download-mask").toggle();
         },
 
         toDownloadList: function() {

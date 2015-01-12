@@ -1,14 +1,18 @@
 <div data-view="player/player" id="player-view">
+
   <header class="header">
     <h1 class="current-channel">频道</h1>
   </header>
+
   <div class="player" >
+
     <div class="progress-wrapper">
       <div class="progress">
         <canvas id="progress" width="200px" height="200px"></canvas>
         <div id="cover"></div>
       </div>
     </div>
+
     <div id="lrc" class="lrc-ctrl">
       <div class="lrc-scroller">
         <div class="lrc-pad"></div>
@@ -16,17 +20,23 @@
         <div class="lrc-pad"></div>
       </div>
     </div>
+
     <div id="title">加载中</div>
     <div id="artist">加载中</div>
-    <ul class="control-pannel">
-      <li id="next" class="icon">&#59940</li><li class="lrc-ctrl icon">&#60024</li><li class="download-pannel-ctrl icon">&#59966</li>
+    <audio id="song" src=""></audio>
+
+    <ul class="upside-control-pannel">
+      <li class="auto-download icon">&#60013</li>
+      <li class="lrc-ctrl icon">&#60024</li>
+      <li class="download-list-btn icon">&#59665</li>
     </ul>
-    <audio autoplay id="song" src=""></audio>
+
   </div>
-  <div class="download-mask download-pannel-ctrl">
-    <ul class="download-pannel">
-      <li class="download-btn icon">&#59966</li>
-      <li class="download-list-btn icon">&#60024</li>
-    </ul>
-  </div>
+
+  <ul class="control-pannel">
+    <li class="share icon">&#60029</li>
+    <li class="download-btn icon">&#59744</li>
+    <li id="next" class="icon">&#59938</li>
+  </ul>
+
 </div>
