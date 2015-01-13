@@ -9,8 +9,14 @@
     <div class="progress-wrapper">
       <div class="progress">
         <canvas id="progress" width="200px" height="200px"></canvas>
-        <div id="cover"></div>
+        <div id="cover">
+          <div class="pause-mask">
+            <div class="triangle"></div>
+          </div>
+          <div class="spinner"></div>
+        </div>
       </div>
+
     </div>
 
     <div id="lrc" class="lrc-ctrl">
@@ -23,7 +29,7 @@
 
     <div id="title">加载中</div>
     <div id="artist">加载中</div>
-    <audio id="song" src=""></audio>
+    <audio autoplay id="song" src=""></audio>
 
     <ul class="upside-control-pannel">
       <li class="auto-download icon">&#60013</li>
@@ -39,4 +45,5 @@
     <li id="next" class="icon">&#59938</li>
   </ul>
 
+  <div class="tips"></div>
 </div>

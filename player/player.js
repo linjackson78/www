@@ -1,4 +1,4 @@
-define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!player/player"], function(View, Util, Client, lrcParser, CSS) {
+define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!player/player", "css!player/css/social.umeng"], function(View, Util, Client, lrcParser, CSS, UMCSS) {
 
     return View.extend({
 
@@ -20,13 +20,15 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             "click .lrc-ctrl": "toggleLrc",
             "click .download-btn": "download",
             "click .download-list-btn": "toDownloadList",
+            "click .auto-download": "toggleAutoDownload",
+            "click .share": "share",
         },
 
         err: function(e) {
             console.log("error!!!!!!!:", e);
         },
         render: function() {
-            var _this = this;
+            window.umappkey = "54b4ba55fd98c55b36000f5a";
         },
 
         onShow: function() {
@@ -34,6 +36,8 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             _this.song = document.getElementById("song");
             _this.$song = $("#song")
             _this.$lrc = $("#lrc")
+            _this.$tips = $(".tips")
+            _this.$pauseMask = $(".pause-mask")
             _this.canvas = document.getElementById("progress")
             _this.context = _this.canvas.getContext("2d");
             var queryStr = location.hash.split("?")[1];
@@ -52,9 +56,9 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     break;
 
                 case "record":
+                    _this.recordArr = Util.getData("songRecord");
                     if (_this.query.target == "") break;
                     var hasNoRecord = true;
-                    _this.recordArr = Util.getData("songRecord");
                     if (_this.recordArr) {
                         _this.recordArr.forEach(function(obj, index) {
                             if (obj.title == _this.query.target) {
@@ -68,7 +72,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                             }
                         })
                     }
-                    $(".current-channel").text("最近播放")
                     if (hasNoRecord) {
                         _this.next(null, "channel", _this.currentChannel)
                     }
@@ -123,7 +126,9 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             function eventInit() {
                 _this.hasInit = true;
                 _this.song.ontimeupdate = onPlaying;
-
+                _this.song.addEventListener("ended", function(){
+                    _this.next();
+                });
                 function onPlaying() {
                     _this.progress();
                     if (_this.timeStampArray) {
@@ -193,17 +198,21 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
 
         next: function(e, mode, target) {
             var _this = this;
+            _this.progress(0);
+            $(".spinner").show();
+            _this.$pauseMask.hide();
             _this.xhr4Song ? _this.xhr4Song.abort() : null;
             _this.xhr4Lrc ? _this.xhr4Lrc.abort() : null;
             _this.xhr4LrcCheck ? _this.xhr4LrcCheck.abort() : null;
             $(".lrc-content").html("<p class='error-tip'>正在加载歌词</p>")
             _this.song ? _this.song.pause() : null;
-            mode = mode || _this.query.mode;
-            target = target || _this.query.target;
+            mode = mode || (_this.query ? _this.query.mode : "channel");
+            target = target || _this.query.target || 1;
             switch (mode) {
                 case "record":
-                    if (target === "") target = _this.recordArr[_this.curRecordIndex];
+                    if (target === "" || target === undefined || target ===1) target = _this.recordArr[_this.curRecordIndex || 0];
                     var song = target;
+                    $(".current-channel").text("最近播放")
                     onSongChange(song.songSrc, song.coverSrc, song.title, song.artist.replace(/\s+\/\s+/g, "-"))
                     var curIndex = _this.curRecordIndex;
                     var nextIndex = curIndex == _this.recordArr.length - 1 ? 0 : curIndex + 1;
@@ -274,9 +283,16 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             function onSongChange(src, cover, title, artist, lrc) {
                 $("#song").attr("src", _this.currentSongSrc = src).load()
                 _this.song.play();
-                $("#cover").css("background-image", "url(" + (_this.currentSongPic = cover) + ")");
+                
+                $('<img/>').attr('src', _this.currentSongPic = cover).load(function() {
+                    $(this).remove(); // prevent memory leaks as @benweet suggested
+                    $("#cover").css("background-image", "url(" + cover + ")");
+                    $(".spinner").hide();
+                });
                 $("#title").text(_this.currentSongTitle = title);
                 $("#artist").text(_this.currentSongArtist = artist);
+
+
                 var songRecord = Util.getData("songRecord") || [];
                 var song = {
                     title: _this.currentSongTitle,
@@ -284,7 +300,15 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     coverSrc: _this.currentSongPic,
                     songSrc: _this.currentSongSrc,
                 }
+
+                //非本地歌曲时
                 if (song.songSrc.indexOf("http") != -1 && _this.query.mode != "record") {
+                    //自动下载
+                    if (_this.autoDownload) {
+                        if (_this.autoDownloadTimer) clearTimeout(_this.autoDownloadTimer);
+                        _this.autoDownloadTimer = setTimeout(_this.download, 4000)
+                    }
+                    //保存收听纪录
                     songRecord.forEach(function(obj, index) {
                         if (song.title == obj.title && song.artist == obj.artist) {
                             songRecord.splice(index, 1)
@@ -402,12 +426,12 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             var _this = this;
             var isExist = false;
             var songId = _this.currentSongTitle + "-" + _this.currentSongArtist;
-            var dirName = _this.myRoot + songId + "/"
+            var dirName = _this.myRoot + songId + "/";
 
             if (!_this.isDeviceReady) return;
             checkExist(songId);
 
-            console.log("downloadIng!!!!!")
+            console.log("downloading!!!!!")
 
             function checkExist(path) {
                 _this.myRootEntry.getDirectory(path, {
@@ -452,7 +476,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
 
         toggleLrc: function() {
             var _this = this;
-            $("#lrc").toggle();
+            $("#lrc").fadeToggle(500);
             if (_this.lrcScroller) setTimeout(function() {
                 _this.lrcScroller.refresh();
                 _this.isTouchingLrc = false;
@@ -466,9 +490,32 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             var _this = this;
             if (_this.song.paused) {
                 _this.song.play();
+                _this.$pauseMask.hide();
             } else {
                 _this.song.pause();
+                _this.$pauseMask.show();
             }
+        },
+
+        toggleAutoDownload: function(){
+            var _this = this;
+            if (_this.isShowingTips) return;
+            _this.autoDownload = _this.autoDownload ? false : true;
+            if (_this.autoDownload) {
+                $(".auto-download").addClass("icon-active");
+                _this.toggleTips("已经打开自动缓存")
+            } else {
+                $(".auto-download").removeClass("icon-active")
+                _this.toggleTips("已经关闭自动缓存")
+            }
+        },
+
+        toggleTips: function(text, show, delay, hide){
+            var _this = this;
+            _this.isShowingTips = true;
+            _this.$tips.text(text).fadeIn(show || 200).delay(delay || 2000).fadeOut(hide || 200, function(){
+                _this.isShowingTips = false;
+            })
         },
 
         toDownloadList: function() {
@@ -479,20 +526,42 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             butterfly.navigate("#channels/channels.html")
         },
 
-        progress: function() {
+        progress: function(deg) {
             //console.log(this.song.played.length, this.song.currentTime, this.song.duration)
             var _this = this;
-            if (this.song.readyState != 4 || this.song.paused || this.song.currentTime == 0) return;
+            if (deg !== 0 && (this.song.paused || this.song.currentTime == 0 || this.song.readyState != 4)) return;
             var percent = Math.ceil(this.song.currentTime / this.song.duration * 10000) / 100
-            if (percent > 98) console.log(this.song.currentTime, this.song.duration)
-            var deg = percent * 3.6;
-            _this.canvas.width = _this.canvas.width;
-            _this.context.beginPath();
-            _this.context.arc(100, 100, 95, -Math.PI * 0.5, deg / 360 * Math.PI * 2 - Math.PI * 0.5, false)
-            _this.context.strokeStyle = "#87AE8B";
-            _this.context.lineWidth = 10;
-            _this.context.lineCap = "round";
-            _this.context.stroke();
+            /*if (percent > 98) {
+                console.log(this.song.currentTime, this.song.duration)
+                _this.nearlyFinished = true;
+                if (!_this.nextSongTimer) _this.nextSongTimer = setTimeout(_this.next, 1000)
+            } else {
+                _this.nearlyFinished = false;
+                if (_this.nextSongTimer) clearTimeout(_this.nextSongTimer)
+            }*/
+            var deg = deg === 0 ? 0 :percent * 3.6;
+            drawLoop(deg);
+
+            function drawLoop (deg) {
+                _this.canvas.width = _this.canvas.width;
+                _this.context.beginPath();
+                _this.context.arc(100, 100, 95, -Math.PI * 0.5, deg / 360 * Math.PI * 2 - Math.PI * 0.5, false)
+                _this.context.strokeStyle = "#87AE8B";
+                _this.context.lineWidth = 10;
+                _this.context.lineCap = "round";
+                _this.context.stroke();
+            }
+        },
+
+        share: function(){
+            var opt = {
+                   'data' : {
+                          'content' : {
+                                 'text' : 'test', //要分享的文字
+                          }
+                   } 
+            }
+            $(".share").umshare(opt);
         },
 
     });

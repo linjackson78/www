@@ -1,5 +1,6 @@
 #download-list-view {
 	background-color: white;
+	font-family: Tahoma "微软雅黑";
 }
 
 
@@ -25,7 +26,7 @@
 
 .song-nav-tab {
 	box-sizing: border-box;
-	color: #000;
+	color: #eee;
 	float: left;
 	width: 50%;
 	height: 40px;
@@ -34,8 +35,9 @@
 }
 
 .song-nav-tab-active {
-	color: #87AE8B;
-	font-size: 120%;
+	background: white;
+	border-radius: 7px 7px 0 0;
+	color: #666;
 }
 
 .song-list-wrapper {
@@ -67,8 +69,11 @@
 .offline-li, .record-li{
 	height: 60px;
 	border-bottom: 1px solid #ddd;
-	font-size: 20px;
+	font-size: 16px;
 	line-height: 60px;
-	font-family: Tahoma;
-	padding-left: 5px; 
+	margin: 0 10px;
+	padding-left: 10px;
+	overflow:hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
