@@ -98,7 +98,7 @@ body {
 }
 
 .lrc-content p {
-	letter-spacing: 1px;
+	letter-spacing: 0px;
 }
 
 p.current-lrc {

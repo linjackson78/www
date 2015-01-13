@@ -12,6 +12,14 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
         offlineArr: [],
         recordArr: [],
         curRecordIndex: null,
+        shareOpt: {
+               'data' : {
+                      'content' : {
+                             'text': "myDouban这个app不错，分享一下",
+                             
+                      }
+               } 
+        },
 
         events: {
             "click #next": "next",
@@ -21,7 +29,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             "click .download-btn": "download",
             "click .download-list-btn": "toDownloadList",
             "click .auto-download": "toggleAutoDownload",
-            "click .share": "share",
         },
 
         err: function(e) {
@@ -59,6 +66,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     _this.recordArr = Util.getData("songRecord");
                     if (_this.query.target == "") break;
                     var hasNoRecord = true;
+                    $(".current-channel").text("最近播放")
                     if (_this.recordArr) {
                         _this.recordArr.forEach(function(obj, index) {
                             if (obj.title == _this.query.target) {
@@ -113,7 +121,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
 
             if (_this.currentChannel && _this.query.mode != "record") {
                 _this.requestChannelDetail(_this.currentChannel);
-            } else if (_this.currentChannel === 0) {
+            } else if (_this.currentChannel === 0 && _this.query.mode != "record") {
                 $(".current-channel").text("离线歌曲")
             }
 
@@ -150,7 +158,13 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     _this.myRoot = cordova.file.externalRootDirectory + "myDouban/";
                     window.resolveLocalFileSystemURL(_this.myRoot, function(entry) {
                         _this.myRootEntry = entry;
-                    }, _this.err)
+                    }, function(){
+                        window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, function(entry){
+                            entry.getDirectory("myDouban", {create: true}, function(entry){
+                                _this.myRootEntry = entry;
+                            })
+                        })
+                    })
                     console.log("device is ready!")
                     shake.startWatch(function(){
                         console.log("shaking!!!!!")
@@ -159,6 +173,11 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     console.log("start watching shaking!!!")
                     setInterval(onPlaying, 500)
                 })
+
+                document.addEventListener("backbutton", onBackKeyDown, false);
+                function onBackKeyDown(e) {
+                  e.preventDefault();
+                }
 
                 $("#lrc").get(0).addEventListener("touchstart", function() {
                     _this.isTouchingLrc = true;
@@ -173,7 +192,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     } catch (e) {}
                 });
                 $(".icon").each(function(){
-
                 })
             }
         },
@@ -281,6 +299,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             }
 
             function onSongChange(src, cover, title, artist, lrc) {
+                
                 $("#song").attr("src", _this.currentSongSrc = src).load()
                 _this.song.play();
                 
@@ -292,6 +311,15 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                 $("#title").text(_this.currentSongTitle = title);
                 $("#artist").text(_this.currentSongArtist = artist);
 
+                _this.shareOpt = {
+                       'data' : {
+                              'content' : {
+                                     'text': "在myDouban上听到这首歌觉得不错，分享一下：" + _this.currentSongTitle + "-" + _this.currentSongArtist + "\n可以在这个地址下载这个App的说：http://weibo.com/u/2257851370",
+                                     'furl': _this.currentSongPic,
+                              }
+                       } 
+                }
+                $(".share").umshare(_this.shareOpt);
 
                 var songRecord = Util.getData("songRecord") || [];
                 var song = {
@@ -306,7 +334,9 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     //自动下载
                     if (_this.autoDownload) {
                         if (_this.autoDownloadTimer) clearTimeout(_this.autoDownloadTimer);
-                        _this.autoDownloadTimer = setTimeout(_this.download, 4000)
+                        _this.autoDownloadTimer = setTimeout(function(){
+                            _this.download();
+                        }, 6000)
                     }
                     //保存收听纪录
                     songRecord.forEach(function(obj, index) {
@@ -431,22 +461,37 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             if (!_this.isDeviceReady) return;
             checkExist(songId);
 
-            console.log("downloading!!!!!")
-
             function checkExist(path) {
                 _this.myRootEntry.getDirectory(path, {
                     create: true, exclusive: true
                 }, function() {
+                    _this.toggleTips("正在离线这首歌")
                     notExist()
+                    console.log("downloading!!!!!")
                 }, function(e){
-                    console.log(e, "may be exclusive")
+                    _this.toggleTips("已经离线这首歌了")
                 })
             }
 
             function notExist() {
                 mp3Downloader = downloadFile(_this.currentSongSrc,
                     dirName + songId + ".mp3",
-                    downloadSuccess)
+                    function(){
+                        if (_this.isShowingTips) {
+                            setTimeout(function(){
+                                _this.toggleTips("离线完了")
+                            }, 4000);
+                            console.log("timeout one")
+                        } else {
+                            _this.toggleTips("离线完了")
+                            console.log("not timeout one")
+                        }
+                        
+                    }, function(err){
+                        if (err.code == 3) {
+                            setTimeout(_this.toggleTips("网络出错了"), 4000);
+                        }
+                    })
                 mp3Downloader.onprogress = function(e){
                     if (e.lengthComputable) {
                          mp3Downloader.percentage = (e.loaded / e.total);
@@ -461,10 +506,11 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                         downloadSuccess)
                 }
             }
-            function downloadFile(url, path, successCb) {
+            function downloadFile(url, path, successCb, errCb) {
                 var fileTransfer = new FileTransfer();
                 var url = encodeURI(url);
-                fileTransfer.download(url, path, successCb, _this.err);
+                errCb = errCb || _this.err
+                fileTransfer.download(url, path, successCb, errCb);
                 return fileTransfer;
             }
 
@@ -503,18 +549,26 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             _this.autoDownload = _this.autoDownload ? false : true;
             if (_this.autoDownload) {
                 $(".auto-download").addClass("icon-active");
-                _this.toggleTips("已经打开自动缓存")
+                _this.toggleTips("已经打开自动缓存", function(){
+                    _this.download();
+                })
+                //if (_this.autoDownloadTimer) clearTimeout(_this.autoDownloadTimer)
+                //_this.autoDownloadTimer = setTimeout(_this.download, 4000)
             } else {
                 $(".auto-download").removeClass("icon-active")
                 _this.toggleTips("已经关闭自动缓存")
             }
         },
 
-        toggleTips: function(text, show, delay, hide){
+        toggleTips: function(text, callback, show, delay, hide){
             var _this = this;
             _this.isShowingTips = true;
             _this.$tips.text(text).fadeIn(show || 200).delay(delay || 2000).fadeOut(hide || 200, function(){
                 _this.isShowingTips = false;
+                if (!!callback) {
+                    callback();
+                    console.log("this shall show after cb")
+                }
             })
         },
 
@@ -551,17 +605,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                 _this.context.lineCap = "round";
                 _this.context.stroke();
             }
-        },
-
-        share: function(){
-            var opt = {
-                   'data' : {
-                          'content' : {
-                                 'text' : 'test', //要分享的文字
-                          }
-                   } 
-            }
-            $(".share").umshare(opt);
         },
 
     });
