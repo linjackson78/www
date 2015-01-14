@@ -1,4 +1,4 @@
-define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!player/player", "css!player/css/social.umeng"], function(View, Util, Client, lrcParser, CSS, UMCSS) {
+define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!player/player",  "css!player/css/social.umeng"], function(View, Util, Client, lrcParser, CSS, UMCSS) {
 
     return View.extend({
 
@@ -479,7 +479,6 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
         },
 
         download: function() {
-            //if (!_this.deviceready) return;
             var _this = this;
             var isExist = false;
             var songId = _this.currentSongTitle + "-" + _this.currentSongArtist;
@@ -501,19 +500,20 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             }
 
             function notExist() {
+                $('<progress max="1.0" value="0" class="progress-bar"></progress>').prependTo($(_this.el));
                 mp3Downloader = downloadFile(_this.currentSongSrc,
                     dirName + songId + ".mp3",
                     function(){
                         if (_this.isShowingTips) {
                             setTimeout(function(){
                                 _this.toggleTips("离线完了")
-                            }, 4000);
+                            }, 2000);
                             console.log("timeout one")
                         } else {
                             _this.toggleTips("离线完了")
                             console.log("not timeout one")
                         }
-                        
+                        $(".progress-bar").remove();
                     }, function(err){
                         if (err.code == 3) {
                             setTimeout(_this.toggleTips("网络出错了"), 4000);
@@ -521,7 +521,8 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     })
                 mp3Downloader.onprogress = function(e){
                     if (e.lengthComputable) {
-                         mp3Downloader.percentage = (e.loaded / e.total);
+                         var percentage = (e.loaded / e.total);
+                         $(".progress-bar").attr("value", percentage)
                        }
                 }
                 downloadFile(_this.currentSongPic,
@@ -549,7 +550,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
 
         toggleLrc: function() {
             var _this = this;
-            $("#lrc").fadeToggle(500);
+            $("#lrc").fadeToggle(200);
             if (_this.lrcScroller) setTimeout(function() {
                 _this.lrcScroller.refresh();
                 _this.isTouchingLrc = false;

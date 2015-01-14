@@ -278,3 +278,11 @@ p.current-lrc {
 	background-color: #87AE8B;
 	color: #eee;
 }
+
+.progress-bar {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 10px;
+	background: blue;
+}

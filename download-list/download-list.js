@@ -52,7 +52,7 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 					html += "<li class='record-li' data-id='"+ record.title + "'><span class='li-title'>" + record.title + "</span><span class='li-artist'>" + record.artist + "</span></li>"
 				})
 			} else {
-				html = "<li class='error-li'> 没有收听纪录 </li>";
+				html = "<li class='error-li'> 没有收听纪录的说~ </li>";
 			}
 			$(".record-song-list").html(html).show();
 			$(".offline-song-list").hide();
@@ -82,8 +82,9 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 			}
 
 			function readEntriesDone(entries){
+				console.log("rendentries done", entries)
 				var html = "";
-				if (entries) {
+				if (entries.length) {
 					entries.sort();
 					entries.forEach(function(entry){
 						if (entry.name.indexOf("_channelCache") == -1) {
@@ -92,7 +93,7 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 						}
 					})
 				} else {
-					html = "<li class='error-li'> 还没下载过歌曲 </li>";
+					html = "<li class='error-li'> 还没下载过歌曲的说~ </li>";
 				}
 				$(".offline-song-list").html(html).show();
 				$(".record-song-list").hide();
