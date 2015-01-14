@@ -37,9 +37,9 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 
 		toPlayer: function(e){
 			var _this = this;
-			var $target = $(e.target)
-			if ($target.hasClass("back")) history.back();
-			if ($target.hasClass("offline-li")) butterfly.navigate("#player/player.html?offline=" + $target.text())
+			var $target = $(e.target).closest("li")
+			if ($(e.target).hasClass("back")) history.back();
+			if ($target.hasClass("offline-li")) butterfly.navigate("#player/player.html?offline=" + $target.data("id"))
 			if ($target.hasClass("record-li")) butterfly.navigate("#player/player.html?record=" + $target.data("id"))
 		},
 
@@ -49,7 +49,7 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 			var html = "";
 			if (songRecord) {
 				songRecord.forEach(function(record, index){
-					html += "<li class='record-li' data-id='"+ record.title + "'>" + record.title + "-" + record.artist + "</li>"
+					html += "<li class='record-li' data-id='"+ record.title + "'><span class='li-title'>" + record.title + "</span><span class='li-artist'>" + record.artist + "</span></li>"
 				})
 			} else {
 				html = "<li class='error-li'> 没有收听纪录 </li>";
@@ -87,8 +87,8 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 					entries.sort();
 					entries.forEach(function(entry){
 						if (entry.name.indexOf("_channelCache") == -1) {
-							html += "<li class='offline-li'>" + entry.name
-							+ "</li>";
+							var match = entry.name.match(/(.+?)-(.+)/);
+							html += "<li class='offline-li' data-id='"+ entry.name + "'><span class='li-title'>" + match[1] + "</span><span class='li-artist'>" + match[2] + "</span></li>"
 						}
 					})
 				} else {

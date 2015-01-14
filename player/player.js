@@ -51,7 +51,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             var alreadyNext = false;
             if (!queryStr) {
                 _this.query.mode = "channel";
-                _this.query.target = 1;
+                _this.query.target = 2;
             } else {
                 _this.query.mode = queryStr.match(/(.*)=/)[1];
                 _this.query.target = queryStr.match(/=(.*)/)[1];
@@ -137,6 +137,13 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                 _this.song.addEventListener("ended", function(){
                     _this.next();
                 });
+                _this.song.addEventListener("canplay", function(){
+                    _this.canPlay = true;
+                    _this.hideSpinner();
+                })
+                _this.song.addEventListener("loadstart", function(){
+                    _this.canPlay = false;
+                })
                 function onPlaying() {
                     _this.progress();
                     if (_this.timeStampArray) {
@@ -147,7 +154,11 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                             _this.currentLrcEle = curEl;
                             if (curEl) {
                                 curEl.className = "current-lrc";
-                                if (!_this.isTouchingLrc) _this.lrcScroller.scrollToElement(curEl, 200, 0, true);
+                                if (!_this.isTouchingLrc) {
+                                    try {
+                                        _this.lrcScroller.scrollToElement(curEl, 200, 0, true);
+                                    } catch(e) {}
+                                }
                             };
                         }
                     }
@@ -302,11 +313,12 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                 
                 $("#song").attr("src", _this.currentSongSrc = src).load()
                 _this.song.play();
-                
+                _this.imgloaded = false;
                 $('<img/>').attr('src', _this.currentSongPic = cover).load(function() {
                     $(this).remove(); // prevent memory leaks as @benweet suggested
                     $("#cover").css("background-image", "url(" + cover + ")");
-                    $(".spinner").hide();
+                    _this.imgloaded = true;
+                    _this.hideSpinner();
                 });
                 $("#title").text(_this.currentSongTitle = title);
                 $("#artist").text(_this.currentSongArtist = artist);
@@ -353,6 +365,11 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                     _this.loadLrc(lrc)
                 }
             }
+        },
+
+        hideSpinner: function(){
+            var _this = this;
+            if (_this.canPlay && _this.imgloaded ) $(".spinner").hide();
         },
 
         searchBaidu: function(title, artist) {
@@ -598,7 +615,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
 
             function drawLoop (deg) {
                 _this.canvas.width = _this.canvas.width;
-                _this.context.beginPath();
+                //_this.context.beginPath();
                 _this.context.arc(100, 100, 95, -Math.PI * 0.5, deg / 360 * Math.PI * 2 - Math.PI * 0.5, false)
                 _this.context.strokeStyle = "#87AE8B";
                 _this.context.lineWidth = 10;

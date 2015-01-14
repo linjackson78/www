@@ -35,9 +35,8 @@
 }
 
 .song-nav-tab-active {
-	background: white;
-	border-radius: 7px 7px 0 0;
-	color: #666;
+	color: white;
+	border-bottom: 4px solid #abc;
 }
 
 .song-list-wrapper {
@@ -76,4 +75,15 @@
 	overflow:hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+span.li-title {
+
+}
+
+span.li-artist {
+	font-size: 80%;
+	vertical-align: 0px;
+	color: #777;
+	padding-left: 5px;
 }
