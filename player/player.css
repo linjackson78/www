@@ -263,7 +263,7 @@ p.current-lrc {
 }
 
 .icon-active {
-	color: #87AE8B;
+	color: #87AE8B !important;
 }
 
 .tips {

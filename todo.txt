@@ -1,2 +1,2 @@
 autoplay
-on touchstart on touch end icon active
+progress bar

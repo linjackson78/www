@@ -196,13 +196,23 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                 });
                 $("#lrc").get(0).addEventListener("touchend", function() {
                     _this.isTouchingLrc = false;
-                    try {
-                        _this.lrcTimer = setTimeout(function() {
-                            if (_this.lrcScroller) _this.lrcScroller.scrollToElement(_this.currentLrcEle, 200, 0, true)
-                        }, 1000)
-                    } catch (e) {}
+                    _this.lrcTimer = setTimeout(function() {
+                        if (_this.lrcScroller) {
+                            try {
+                                _this.lrcScroller.scrollToElement(_this.currentLrcEle, 200, 0, true)
+                            } catch (e) {}
+                        }
+                    }, 1000)
                 });
                 $(".icon").each(function(){
+                    if (!$(this).hasClass("auto-download")) {
+                        this.addEventListener("touchstart", function(){
+                            $(this).addClass("icon-active")
+                        })
+                        this.addEventListener("touchend", function(){
+                            $(this).removeClass("icon-active")
+                        })
+                    }
                 })
             }
         },
@@ -386,7 +396,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                 },
                 dataType: "json",
                 success: function(data) {
-                    if (data.song[0]) {
+                    if (data.song && data.song[0]) {
                         console.log("百度有这歌，正在查歌曲信息")
 
                         _this.getSongInfo(data.song[0].songid)
