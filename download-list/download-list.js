@@ -49,7 +49,7 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 			var html = "";
 			if (songRecord) {
 				songRecord.forEach(function(record, index){
-					html += "<li class='record-li' data-id='"+ record.title + "'><span class='li-title'>" + record.title + "</span><span class='li-artist'>" + record.artist + "</span></li>"
+					html += '<li class="record-li" data-id="'+ record.title + '"><span class="li-title">' + record.title + '</span><span class="li-artist">' + record.artist + '</span></li>'
 				})
 			} else {
 				html = "<li class='error-li'> 没有收听纪录的说~ </li>";
@@ -89,7 +89,7 @@ define(['butterfly/view', "main/util", "main/client", "css!download-list/downloa
 					entries.forEach(function(entry){
 						if (entry.name.indexOf("_channelCache") == -1) {
 							var match = entry.name.match(/(.+?)-(.+)/);
-							html += "<li class='offline-li' data-id='"+ entry.name + "'><span class='li-title'>" + match[1] + "</span><span class='li-artist'>" + match[2] + "</span></li>"
+							html += '<li class="offline-li" data-id="'+ entry.name + '"><span class="li-title">' + match[1] + '</span><span class="li-artist">' + match[2] + '</span></li>'
 						}
 					})
 				} else {
