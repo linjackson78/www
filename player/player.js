@@ -51,7 +51,7 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
             var alreadyNext = false;
             if (!queryStr) {
                 _this.query.mode = "channel";
-                _this.query.target = 2;
+                _this.query.target = 1;
             } else {
                 _this.query.mode = queryStr.match(/(.*)=/)[1];
                 _this.query.target = queryStr.match(/=(.*)/)[1];
@@ -314,12 +314,13 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                         success: function(data) {
                             //data = Util.fakeData
                             var song = data.song[0]
-                            onSongChange(song.url, song.picture, song.title, song.artist.replace(/\s+\/\s+/g, "-"))
+                            
+                            onSongChange(song.url, song.picture, song.title, song.artist.replace(/\s+\/\s+/g, "-"), null, song.sid, song.ssid)
                         }
                     });
             }
 
-            function onSongChange(src, cover, title, artist, lrc) {
+            function onSongChange(src, cover, title, artist, lrc, sid, ssid) {
                 
                 $("#song").attr("src", _this.currentSongSrc = src).load()
                 _this.song.play();
@@ -332,11 +333,13 @@ define(['butterfly/view', "main/util", "main/client", "main/parseLrc", "css!play
                 });
                 $("#title").text(_this.currentSongTitle = title);
                 $("#artist").text(_this.currentSongArtist = artist);
-
+                _this.sid = sid;
+                _this.ssid = ssid;
                 _this.shareOpt = {
                        'data' : {
                               'content' : {
-                                     'text': "在myDouban上听到这首歌觉得不错，分享一下：" + _this.currentSongTitle + "-" + _this.currentSongArtist + "\n可以在这个地址下载这个App的说：http://weibo.com/u/2257851370",
+                                     'text': "在myDouban上听到这首歌觉得不错，分享一下：" + _this.currentSongTitle + "-" + _this.currentSongArtist + "\n" + "http://douban.fm/?start=" + _this.sid + "g" + _this.ssid + "g" + 0 + "&cid=2" + _this.sid, 
+
                                      'furl': _this.currentSongPic,
                               }
                        } 

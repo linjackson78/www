@@ -219,7 +219,6 @@ p.current-lrc {
 	left: 20%;
 }
 
-
 .auto-download {
 	font-size: 31px;
 	position: absolute;
@@ -229,8 +228,6 @@ p.current-lrc {
 
 
 .lrc-ctrl {
-	position: absolute;
-	left: 43%;
 }
 
 .download-list-btn {
